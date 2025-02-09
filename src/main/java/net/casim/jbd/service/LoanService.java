@@ -157,12 +157,6 @@ public class LoanService {
      * For example, if an installment's effective amount is 10 and the payment amount is 20,
      * then two installments are paid. If the payment amount is 15, only one installment is paid;
      * if the payment amount is 5, no installment is paid.
-     *
-     * @param loanId the ID of the loan to pay
-     * @param paymentRequest the payment details (amount)
-     * @return a PaymentResponse containing the number of installments paid, total amount paid,
-     *         and whether the loan is fully paid
-     * @throws PaymentException if no installment can be fully paid with the provided amount.
      */
     @Transactional
     @Retryable(retryFor = {OptimisticLockingFailureException.class},

@@ -14,6 +14,6 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Loan API")
                         .version("1.0")
-                        .description("API for creating, listing, and paying loans."));
+                        .description("Loan API with H2, JWT, Swagger, and Unit Tests"));
     }
 }

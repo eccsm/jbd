@@ -27,10 +27,7 @@ public class LoanHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(LoanHelper.class);
 
-
     private final BigDecimal minInterest;
-
-
     private final BigDecimal maxInterest;
 
     private final CustomerRepository customerRepository;
@@ -122,10 +119,8 @@ public class LoanHelper {
 
     public List<Loan> fetchLoanByCustomerId(Long customerId) {
         fetchCustomerById(customerId);
-
-        return findLoansByCustomerId(customerId);
+        return loanRepository.findByCustomerId(customerId);
     }
-
 
     public Loan saveLoan(Loan loan) {
         return loanRepository.save(loan);
@@ -139,12 +134,12 @@ public class LoanHelper {
         installmentRepository.saveAll(installments);
     }
 
-    public List<Loan> findLoansByCustomerId(Long customerId) {
-        return loanRepository.findByCustomerId(customerId);
-    }
-
     public List<LoanInstallment> findInstallmentsByLoanIdOrderByDueDateAsc(Long loanId) {
-        return installmentRepository.findByLoanIdOrderByDueDateAsc(loanId);
+        List<LoanInstallment> installments = installmentRepository.findByLoanIdOrderByDueDateAsc(loanId);
+        if (installments.isEmpty()) {
+            throw new IllegalArgumentException("No installments found for loan id: " + loanId);
+        }
+        return installments;
     }
 
     public void saveInstallment(LoanInstallment installment) {

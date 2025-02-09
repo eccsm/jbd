@@ -22,10 +22,8 @@ public class Customer {
 
     private String surname;
 
-    // Maximum credit the customer can use.
     private BigDecimal creditLimit;
 
-    // Already used credit limit.
     private BigDecimal usedCreditLimit = BigDecimal.ZERO;
 
     @OneToOne
@@ -43,7 +41,6 @@ public class Customer {
         this.usedCreditLimit = this.usedCreditLimit.add(amount);
     }
 
-    // New helper method to subtract used credit.
     public void subtractUsedCredit(BigDecimal amount) {
         this.usedCreditLimit = this.usedCreditLimit.subtract(amount);
     }

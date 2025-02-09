@@ -17,33 +17,24 @@ import java.util.stream.Collectors;
 @Component
 public class JwtUtil {
 
-    @Value("${security.jwt.secret-key}")
-    private String secretKey;
+    private final String secretKey;
+    private final long jwtExpiration;
 
-    @Value("${security.jwt.expiration-time}")
-    private long jwtExpiration;
+    public JwtUtil(@Value("${security.jwt.secret-key}") String secretKey, @Value("${security.jwt.expiration-time}") long jwtExpiration) {
+        this.secretKey = secretKey;
+        this.jwtExpiration = jwtExpiration;
+    }
 
-    /**
-     * Extracts the username (subject) from the JWT token.
-     */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    /**
-     * Extracts a specific claim from the JWT token.
-     */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    /**
-     * Generates a JWT token for the given user.
-     * The token contains a "roles" claim with a list of roles (each prefixed with "ROLE_").
-     */
     public String generateToken(User user) {
-        // Prepare claims; here we add the roles claim
         Map<String, Object> claims = Map.of(
                 "roles", user.getRoles().stream()
                         .map(role -> "ROLE_" + role.name())
@@ -57,9 +48,6 @@ public class JwtUtil {
         return jwtExpiration;
     }
 
-    /**
-     * Builds the JWT token by individually adding each claim (avoiding the deprecated setClaims(Map)).
-     */
     private String buildToken(Map<String, Object> claims, User user) {
         return Jwts
                 .builder()
@@ -71,9 +59,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    /**
-     * Validates the token against the given user.
-     */
+
     public boolean isTokenValid(String token, User user) {
         final String username = extractUsername(token);
         return (username.equals(user.getUsername())) && !isTokenExpired(token);
