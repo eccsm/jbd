@@ -77,8 +77,8 @@ The application also includes Swagger/OpenAPI documentation and is fully Dockeri
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/eccsm/loan-management-app.git
-   cd loan-management-app
+   git clone https://github.com/eccsm/jbd.git
+   cd jbd
    ```
 2. **Build the Application:**
 
