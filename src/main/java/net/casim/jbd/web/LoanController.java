@@ -9,9 +9,12 @@ import net.casim.jbd.dto.response.PaymentResponse;
 import net.casim.jbd.entity.Loan;
 import net.casim.jbd.entity.LoanInstallment;
 import net.casim.jbd.service.LoanService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 import java.util.List;
 
@@ -38,11 +41,18 @@ public class LoanController {
 
     @Operation(
             summary = "Get Loans",
-            description = "Retrieves all loans for a specified customer, including computed remaining fees."
+            description = "Retrieves loans for a specified customer with optional filters, including computed remaining fees."
     )
     @GetMapping
-    public ResponseEntity<List<Loan>> getLoans(@RequestParam Long customerId) {
-        List<Loan> loans = loanService.getLoansForCustomer(customerId);
+    public ResponseEntity<List<Loan>> getLoans(
+            @RequestParam Long customerId,
+            @RequestParam(required = false) Boolean isPaid,
+            @RequestParam(required = false) Integer numberOfInstallments,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        
+        List<Loan> loans = loanService.getLoansForCustomer(
+                customerId, isPaid, numberOfInstallments, startDate, endDate);
         return ResponseEntity.ok(loans);
     }
 

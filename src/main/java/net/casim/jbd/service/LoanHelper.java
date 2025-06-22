@@ -121,6 +121,29 @@ public class LoanHelper {
         fetchCustomerById(customerId);
         return loanRepository.findByCustomerId(customerId);
     }
+    
+    public List<Loan> findByCustomerIdAndIsPaid(Long customerId, boolean isPaid) {
+        fetchCustomerById(customerId);
+        return loanRepository.findByCustomerIdAndIsPaid(customerId, isPaid);
+    }
+    
+    public List<Loan> findByCustomerIdAndNumberOfInstallment(Long customerId, int numberOfInstallment) {
+        fetchCustomerById(customerId);
+        return loanRepository.findByCustomerIdAndNumberOfInstallment(customerId, numberOfInstallment);
+    }
+    
+    public List<Loan> findByCustomerIdAndIsPaidAndNumberOfInstallment(
+            Long customerId, boolean isPaid, int numberOfInstallment) {
+        fetchCustomerById(customerId);
+        return loanRepository.findByCustomerIdAndIsPaidAndNumberOfInstallment(
+                customerId, isPaid, numberOfInstallment);
+    }
+    
+    public List<Loan> findByCustomerIdAndDateRange(
+            Long customerId, LocalDate startDate, LocalDate endDate) {
+        fetchCustomerById(customerId);
+        return loanRepository.findByCustomerIdAndDateRange(customerId, startDate, endDate);
+    }
 
     public Loan saveLoan(Loan loan) {
         return loanRepository.save(loan);

@@ -125,20 +125,66 @@ public class LoanService {
 
     /**
      * Retrieves loans for a given customer and computes their remaining fee.
+     * Supports optional filtering by loan status, number of installments, and date range.
      */
     public List<Loan> getLoansForCustomer(Long customerId) {
-        logger.info("Retrieving loans for customer id: {}", customerId);
-        List<Loan> loans = loanHelper.fetchLoanByCustomerId(customerId);
-        LocalDate today = LocalDate.now();
+        return getLoansForCustomer(customerId, null, null, null, null);
+    }
 
-        loans.forEach(loan -> {
-            BigDecimal totalRemaining = loan.getInstallments().stream()
+    /**
+     * Retrieves loans for a given customer with optional filters and computes their remaining fee.
+     *
+     * @param customerId          The customer ID
+     * @param isPaid              Filter by whether the loan is paid (null for no filter)
+     * @param numberOfInstallment Filter by number of installments (null for no filter)
+     * @param startDate           Filter by minimum creation date (null for no lower bound)
+     * @param endDate             Filter by maximum creation date (null for no upper bound)
+     * @return List of filtered loans with computed remaining fee
+     */
+    public List<Loan> getLoansForCustomer(
+            Long customerId,
+            Boolean isPaid,
+            Integer numberOfInstallment,
+            LocalDate startDate,
+            LocalDate endDate) {
+
+        logger.info("Retrieving loans for customer id: {} with filters: isPaid={}, installments={}, startDate={}, endDate={}",
+                customerId, isPaid, numberOfInstallment, startDate, endDate);
+
+        // Check if customer exists (throws exception if not found).
+        loanHelper.fetchCustomerById(customerId);
+
+        // Retrieve loans for the customer with appropriate filters.
+        List<Loan> loans;
+        if (isPaid != null && numberOfInstallment != null) {
+            loans = loanHelper.findByCustomerIdAndIsPaidAndNumberOfInstallment(
+                    customerId, isPaid, numberOfInstallment);
+        } else if (isPaid != null) {
+            loans = loanHelper.findByCustomerIdAndIsPaid(customerId, isPaid);
+        } else if (numberOfInstallment != null) {
+            loans = loanHelper.findByCustomerIdAndNumberOfInstallment(
+                    customerId, numberOfInstallment);
+        } else if (startDate != null || endDate != null) {
+            loans = loanHelper.findByCustomerIdAndDateRange(
+                    customerId, startDate, endDate);
+        } else {
+            loans = loanHelper.fetchLoanByCustomerId(customerId);
+        }
+
+        // Compute remaining fee for each loan.
+        LocalDate today = LocalDate.now();
+        for (Loan loan : loans) {
+            List<LoanInstallment> installments = loan.getInstallments();
+            
+            // Calculate total amount based on remaining unpaid installments
+            BigDecimal remainingAmount = installments.stream()
                     .filter(installment -> !installment.isPaid())
                     .map(installment -> loanHelper.calculateEffectiveInstallmentAmount(
                             installment.getAmount(), today, installment.getDueDate()))
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
-            loan.setRemainingFee(totalRemaining.setScale(2, RoundingMode.HALF_UP));
-        });
+            loan.setRemainingFee(remainingAmount);
+        }
+
         return loans;
     }
 

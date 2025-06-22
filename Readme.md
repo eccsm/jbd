@@ -1,4 +1,14 @@
-# Loan Management Application
+<div align="center">
+
+# 🏦 Loan Management Application
+
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Java](https://img.shields.io/badge/Java-17%2B-orange.svg)](https://www.oracle.com/java/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+*A robust RESTful API for managing customer loans with integrated security and payment processing*
+
+</div>
 
 This is a Loan Management Application built with Spring Boot. It allows users to create loans, process payments, view loan details, and handle user authentication (signup and login) using JWT tokens. The application supports role-based access control where:
 - **Customers** can only create loans for themselves.
@@ -23,7 +33,7 @@ The application also includes Swagger/OpenAPI documentation and is fully Dockeri
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
-## Features
+## ✨ Features
 
 - **User Authentication:**
     - Signup: Create new users and their associated customer records.
@@ -31,10 +41,14 @@ The application also includes Swagger/OpenAPI documentation and is fully Dockeri
 - **Loan Management:**
     - Create Loan: Customers can create loans for themselves; admins can create loans for any customer.
     - View Loans: Retrieve loans for a customer along with computed remaining fees.
+        - Filter loans by payment status (isPaid)
+        - Filter loans by number of installments
+        - Filter loans by date range (createDate)
     - Payment Processing: Process payments against loan installments.
     - Delete Loan: Remove loans (admins only) and adjust customer credit accordingly.
 - **API Documentation:**
     - Swagger UI is provided to explore and test all endpoints.
+    - Interactive API documentation with request/response examples.
 - **Docker Support:**
     - Fully Dockerized using a multi-stage build for a minimal final image.
 - **Profiles:**
@@ -42,7 +56,7 @@ The application also includes Swagger/OpenAPI documentation and is fully Dockeri
 - **Data Initialization:**
     - A starter initializer creates sample user and customer records (2 admins and 3 customers) when running in development mode.
 
-## Technologies
+## 🛠️ Technologies
 
 - **Backend:** Spring Boot, Spring MVC, Spring Data JPA, Spring Security (JWT)
 - **API Documentation:** Swagger / OpenAPI (using `springdoc-openapi`)
@@ -51,14 +65,14 @@ The application also includes Swagger/OpenAPI documentation and is fully Dockeri
 - **Containerization:** Docker (multi-stage build)
 - **Testing:** JUnit 5, Mockito
 
-## Prerequisites
+## 📋 Prerequisites
 
 - **Java JDK 17 or later**
 - **Maven 3.6 or later**
 - **Docker** (for containerization)
 - **Git** (for source code management)
 
-## Installation
+## 💿 Installation
 
 1. **Clone the Repository:**
 
@@ -75,7 +89,7 @@ The application also includes Swagger/OpenAPI documentation and is fully Dockeri
    ```
    This will create an executable JAR file (e.g., `loan-app-0.0.1-SNAPSHOT.jar`) in the `target/` directory.
 
-## Running the Application
+## 🚀 Running the Application
 
 ### Using Spring Boot (Local)
 
@@ -115,7 +129,7 @@ set SPRING_PROFILES_ACTIVE=dev
 java -jar target/loan-app.jar
 ```
 
-## API Documentation (Swagger)
+## 📚 API Documentation (Swagger)
 
 This application uses `springdoc-openapi` to generate Swagger UI for API documentation.
 
@@ -133,7 +147,42 @@ If needed, customize the path in your `application.properties`:
 springdoc.swagger-ui.path=/swagger-ui.html
 ```
 
-## Testing
+### API Endpoints Overview
+
+#### Authentication
+- `POST /api/auth/signup`: Register a new user with ADMIN or CUSTOMER role
+- `POST /api/auth/login`: Authenticate and retrieve JWT token
+
+#### Loan Management
+- `POST /loans`: Create a new loan
+- `GET /loans`: List loans with optional filtering
+- `GET /loans/{loanId}/installments`: Get installments for a specific loan
+- `POST /loans/{loanId}/pay`: Process payment for a loan
+- `DELETE /loans/{loanId}`: Delete a loan (admin only)
+
+### Filtering Examples
+
+The loan listing endpoint now supports various filtering options:
+
+```
+# Basic - Get all loans for customer 123
+GET /loans?customerId=123
+
+# Filter by payment status
+GET /loans?customerId=123&isPaid=true
+GET /loans?customerId=123&isPaid=false
+
+# Filter by number of installments
+GET /loans?customerId=123&numberOfInstallments=12
+
+# Filter by date range
+GET /loans?customerId=123&startDate=2025-01-01&endDate=2025-06-22
+
+# Combined filters
+GET /loans?customerId=123&isPaid=false&numberOfInstallments=24
+```
+
+## 🧪 Testing
 
 The project uses JUnit 5 and Mockito for unit testing.
 
@@ -143,7 +192,7 @@ Run Tests:
 mvn test
 ```
 
-## Dockerization
+## 🐳 Dockerization
 
 This project is Dockerized using a multi-stage Docker build. Below is the Dockerfile setup:
 
@@ -184,7 +233,7 @@ docker run -p 8080:8080 loan-app
 
 Your application will now be accessible at `http://localhost:8080`.
 
-## Data Initialization
+## 🗄️ Data Initialization
 
 A data initializer (using `CommandLineRunner`) is included (e.g., in a class like `DataInitializer` under the `net.casim.jbd.initializer` package). This component creates sample users (2 admins and 3 customers) when the application starts in **development mode**.
 
@@ -194,13 +243,13 @@ The initializer is annotated with `@Profile("dev")`, so it runs only when the ap
 ### Usage
 When you run your app in **dev mode**, the initializer creates sample users that you can use to log in and test the application.
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
 - **Swagger UI Not Found:** If you see an error like `No static resource swagger-ui/index.html`, verify that the correct `springdoc-openapi` dependency is included and check your Swagger UI path configuration.
 - **Mockito Agent Warning:** If you see a warning about Mockito self-attaching, configure the Mockito agent in your build (see Mockito’s documentation).
 - **Profile Issues:** Ensure to set the active profile using `--spring.profiles.active` or an environment variable if you expect specific behavior (like data initialization in dev mode).
 
-## License
+## 📄 License
 
 This project is licensed under the **MIT License**. See the `LICENSE` file for details.
 
